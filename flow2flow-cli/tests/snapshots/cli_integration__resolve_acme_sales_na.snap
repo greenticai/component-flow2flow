@@ -1,0 +1,16 @@
+---
+source: flow2flow-cli/tests/cli_integration.rs
+assertion_line: 49
+expression: output
+---
+{
+  "allow": [
+    "acme:sales-na"
+  ],
+  "caller": "assistant.shell",
+  "caller_allowed": true,
+  "flow_id": "assistant.weather.daily",
+  "intent": "assistant.weather.daily",
+  "path": "/tenants/acme/teams/sales-na/flows/assistant.weather.daily@1",
+  "version": "1.0.0"
+}

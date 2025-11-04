@@ -1,0 +1,12 @@
+---
+source: flow2flow-cli/tests/cli_integration.rs
+assertion_line: 25
+expression: output
+---
+{
+  "deprecated_nodes_array": false,
+  "flow_id": "assistant.weather.daily",
+  "path": "/Users/maarten/Documents/GitHub/agentic/component-flow2flow/flow2flow-cli/../examples/weather.yml",
+  "status": "ok",
+  "version": 1
+}

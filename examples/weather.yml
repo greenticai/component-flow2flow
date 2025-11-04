@@ -1,0 +1,45 @@
+flow_id: assistant.weather.daily
+version: 1
+nodes:
+  entry:
+    f2f.in:
+      intent: weather.get
+      params:
+        location:
+          kind: string
+          required: true
+        date:
+          kind: string
+          required: false
+          default: today
+      visibility: ["tenant_scoped", "team_overridable"]
+      allow: ["*", "assistant.weather.*", "connector.*"]
+  fetch:
+    f2f.call:
+      target: connector.weather.get@1
+      mode: sync
+      timeout_ms: 1000
+      retry:
+        attempts: 2
+        delay_ms: 150
+      params_map:
+        location: "{{ params.location }}"
+        date: "{{ params.date | default('today') }}"
+      result_map:
+        forecast_date: "{{ result.payload.forecast_date }}"
+        temp_c: "{{ result.payload.temp_c }}"
+      on_error:
+        route: faq.search
+        mapper: "{ \"q\": \"weather service is down\" }"
+  respond:
+    f2f.out:
+      returns:
+        forecast_date:
+          kind: string
+          required: true
+        temp_c:
+          kind: number
+          required: true
+        description:
+          kind: string
+          required: false

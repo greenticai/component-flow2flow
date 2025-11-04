@@ -1,0 +1,21 @@
+[workspace]
+members = [
+    "flow2flow-contract",
+    "flow2flow-runtime",
+    "flow2flow-router-adapter",
+    "flow2flow-cli",
+    "examples",
+    "conformance",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+rust-version = "1.74"
+
+[workspace.dependencies]
+flow2flow-contract = { path = "flow2flow-contract" }
+flow2flow-runtime = { path = "flow2flow-runtime" }
+flow2flow-router-adapter = { path = "flow2flow-router-adapter" }

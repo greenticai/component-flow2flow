@@ -1,0 +1,19 @@
+flow_id: assistant.legacy.list
+version: 1
+nodes:
+  - f2f.in:
+      intent: legacy.list
+      params:
+        query:
+          kind: string
+          required: true
+      allow:
+        tenants: ["*"]
+  - f2f.call:
+      target: component.list
+      mode: sync
+  - f2f.out:
+      returns:
+        items:
+          kind: array
+          required: true

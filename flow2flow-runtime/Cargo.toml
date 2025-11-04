@@ -1,0 +1,18 @@
+[package]
+name = "flow2flow-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+flow2flow-contract = { workspace = true }
+minijinja = { version = "2.0.3", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tracing = "0.1"
+
+[dev-dependencies]
+flow2flow-router-adapter = { workspace = true }
+semver = { version = "1", features = ["serde"] }

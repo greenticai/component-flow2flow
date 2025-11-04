@@ -1,0 +1,22 @@
+flow_id: assistant.weather.daily
+version: 1
+nodes:
+  n01:
+    f2f.in:
+      intent: assistant.weather.daily
+      params:
+        location:
+          kind: string
+          required: true
+      allow:
+        - acme:sales-na
+  n02:
+    f2f.call:
+      target: component.weather.fetch
+      mode: sync
+  n03:
+    f2f.out:
+      returns:
+        payload:
+          kind: object
+          required: true

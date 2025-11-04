@@ -1,0 +1,18 @@
+---
+source: flow2flow-cli/tests/cli_integration.rs
+assertion_line: 37
+expression: publish_tenant
+---
+{
+  "activated": false,
+  "deprecated_nodes_array": false,
+  "flow_id": "assistant.weather.daily",
+  "path": "/tenants/acme/flows/assistant.weather.daily@1",
+  "scope": {
+    "team": null,
+    "tenant": "acme",
+    "user": null
+  },
+  "status": "published",
+  "version": 1
+}

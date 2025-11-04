@@ -1,0 +1,362 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FlowSpec",
+  "type": "object",
+  "required": [
+    "flow_id"
+  ],
+  "properties": {
+    "errors": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ErrorSpec"
+      }
+    },
+    "flow_id": {
+      "type": "string"
+    },
+    "nodes": {
+      "default": {},
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/NodeDef"
+      }
+    },
+    "version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint32",
+      "minimum": 0.0
+    }
+  },
+  "definitions": {
+    "CallMode": {
+      "type": "string",
+      "enum": [
+        "sync",
+        "async",
+        "fire_and_forget"
+      ]
+    },
+    "CallSpec": {
+      "type": "object",
+      "required": [
+        "mode",
+        "target"
+      ],
+      "properties": {
+        "join": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/JoinSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "$ref": "#/definitions/CallMode"
+        },
+        "on_error": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/OnErrorSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "params_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "result_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "retry": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RetrySpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Scope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target": {
+          "type": "string"
+        },
+        "timeout_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "ErrorSpec": {
+      "type": "object",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "detail": true,
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retryable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "InSpec": {
+      "type": "object",
+      "required": [
+        "intent"
+      ],
+      "properties": {
+        "allow": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intent": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ValidatorSpec"
+          }
+        },
+        "router": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "visibility": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "JoinSpec": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/JoinStrategy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "with": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "JoinStrategy": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any"
+      ]
+    },
+    "NodeDef": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "f2f.in"
+          ],
+          "properties": {
+            "f2f.in": {
+              "$ref": "#/definitions/InSpec"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "f2f.call"
+          ],
+          "properties": {
+            "f2f.call": {
+              "$ref": "#/definitions/CallSpec"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "f2f.out"
+          ],
+          "properties": {
+            "f2f.out": {
+              "$ref": "#/definitions/OutSpec"
+            }
+          }
+        }
+      ]
+    },
+    "OnErrorSpec": {
+      "type": "object",
+      "required": [
+        "route"
+      ],
+      "properties": {
+        "mapper": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "route": {
+          "type": "string"
+        }
+      }
+    },
+    "OutSpec": {
+      "type": "object",
+      "properties": {
+        "docs": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "returns": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ValidatorSpec"
+          }
+        }
+      }
+    },
+    "ParamKind": {
+      "type": "string",
+      "enum": [
+        "string",
+        "integer",
+        "number",
+        "boolean",
+        "object",
+        "array"
+      ]
+    },
+    "RetrySpec": {
+      "type": "object",
+      "required": [
+        "attempts"
+      ],
+      "properties": {
+        "attempts": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "delay_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "max_delay_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    },
+    "Scope": {
+      "type": "object",
+      "required": [
+        "tenant"
+      ],
+      "properties": {
+        "team": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tenant": {
+          "type": "string"
+        },
+        "user": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "ValidatorSpec": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "default": true,
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/definitions/ParamKind"
+        },
+        "required": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
