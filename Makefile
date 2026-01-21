@@ -1,18 +1,34 @@
-CLIPPY_ARGS = --workspace --all-targets
+BUILD_FLAGS ?=
+CLIPPY_ARGS ?= --workspace --all-targets
 
-.PHONY: build test lint fmt check
+.PHONY: build wasm flows check lint fmt test workspace-build workspace-check
+
+default: build
 
 build:
-	cargo build --workspace --all-targets
+	greentic-component build $(BUILD_FLAGS)
 
-test:
-	cargo test --workspace
+flows:
+	greentic-component flow scaffold --force
+
+wasm:
+	cargo build --target wasm32-wasip2 --release
+
+check:
+	cargo check --target wasm32-wasip2
 
 lint:
+	cargo fmt --all
 	cargo clippy $(CLIPPY_ARGS) -- -D warnings
 
 fmt:
 	cargo fmt --all
 
-check:
+test:
+	cargo test --workspace --all-targets
+
+workspace-build:
+	cargo build --workspace --all-targets
+
+workspace-check:
 	cargo check --workspace --all-targets

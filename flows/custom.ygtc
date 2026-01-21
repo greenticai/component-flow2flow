@@ -1,0 +1,27 @@
+id: ai.greentic.component-flow2flow.custom
+kind: component-config
+description: Auto-generated custom config for ai.greentic.component-flow2flow
+nodes:
+  ask_config:
+    questions:
+      fields:
+      - id: echo_prefix
+        prompt: Prefix prepended to every handle response
+        type: string
+        default: component-flow2flow
+    routing:
+    - to: emit_config
+  emit_config:
+    template: |-
+      {
+        "node_id": "COMPONENT_STEP",
+        "node": {
+          "tool": {
+            "component": "ai.greentic.component-flow2flow",
+            "echo_prefix": "{{state.echo_prefix}}"
+          },
+          "routing": [
+            { "to": "NEXT_NODE_PLACEHOLDER" }
+          ]
+        }
+      }

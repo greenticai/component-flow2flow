@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [stable, "1.74.0"]
+        toolchain: [stable, "1.89.0"]
     env:
       CARGO_TERM_COLOR: always
     steps:

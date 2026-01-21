@@ -1,6 +1,14 @@
 # component-flow2flow
 
-Flow-to-flow experimentation sandbox that validates contracts, executes runtimes, and integrates with a router adapter. The workspace is intentionally minimal to keep early iterations fast while providing a place for conformance tests and sample flows.
+Flow-to-flow experimentation sandbox that now ships as a Greentic component. The repository includes the component surface (manifest, schemas, WIT) plus supporting crates for contracts, runtime execution, router integration, and a local CLI.
+
+## Greentic component
+
+- Requirements: Rust 1.89+, `rustup target add wasm32-wasip2`, and the `greentic-component` CLI.
+- `make build` runs `greentic-component build` against `component.manifest.json` and produces `target/wasm32-wasip2/release/component_flow2flow.wasm`.
+- `make wasm` builds the WASI-P2 artifact directly; `make check` performs a target check; `make lint` / `make fmt` cover the workspace.
+- Update the manifest hash after rebuilding: `greentic-component inspect --json target/wasm32-wasip2/release/component_flow2flow.wasm`.
+- Schemas live in `schemas/`, WIT in `wit/`, and basic conformance tests under `tests/`.
 
 ## Workspace layout
 
@@ -11,17 +19,7 @@ Flow-to-flow experimentation sandbox that validates contracts, executes runtimes
 - `examples` – Sample flow definitions used across tooling.
 - `conformance` – Early conformance and idempotency utilities.
 
-## Getting started
-
-```bash
-make build  # cargo build --workspace --all-targets
-make test   # cargo test --workspace
-make fmt    # cargo fmt --all
-make lint   # cargo clippy --workspace --all-targets -- -D warnings
-make check  # cargo check --workspace --all-targets
-```
-
-The workspace targets the Rust 1.74 toolchain and stable. CI mirrors these flows through GitHub Actions.
+`make test` exercises the full workspace; `make workspace-build` and `make workspace-check` keep the supporting crates healthy.
 
 ## Documentation & Policy
 

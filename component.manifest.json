@@ -1,0 +1,63 @@
+{
+  "$schema": "https://greentic-ai.github.io/greentic-component/schemas/v1/component.manifest.schema.json",
+  "artifacts": {
+    "component_wasm": "target/wasm32-wasip2/release/component_flow2flow.wasm"
+  },
+  "capabilities": {
+    "host": {
+      "messaging": {
+        "inbound": true,
+        "outbound": true
+      },
+      "secrets": {
+        "required": []
+      },
+      "telemetry": {
+        "scope": "node"
+      }
+    },
+    "wasi": {
+      "clocks": true,
+      "filesystem": {
+        "mode": "none",
+        "mounts": []
+      },
+      "random": true
+    }
+  },
+  "config_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "echo_prefix": {
+        "default": "component-flow2flow",
+        "description": "Prefix prepended to every handle response",
+        "type": "string",
+        "x-default-applied": true
+      }
+    },
+    "title": "component-flow2flow component configuration",
+    "type": "object"
+  },
+  "describe_export": "get-manifest",
+  "hashes": {
+    "component_wasm": "blake3:cedfcd4277ac24f0b7af7556440ed0734b90d5a8e749fc78f9a258c5509eef65"
+  },
+  "id": "ai.greentic.component-flow2flow",
+  "limits": {
+    "memory_mb": 128,
+    "wall_time_ms": 1000
+  },
+  "name": "component-flow2flow",
+  "profiles": {
+    "default": "stateless",
+    "supported": [
+      "stateless"
+    ]
+  },
+  "supports": [
+    "messaging"
+  ],
+  "version": "0.1.0",
+  "world": "greentic:component/component@0.5.0"
+}

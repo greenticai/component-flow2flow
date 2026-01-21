@@ -1,0 +1,17 @@
+id: ai.greentic.component-flow2flow.default
+kind: component-config
+description: Auto-generated default config for ai.greentic.component-flow2flow
+nodes:
+  emit_config:
+    template: |-
+      {
+        "node_id": "COMPONENT_STEP",
+        "node": {
+          "tool": {
+            "component": "ai.greentic.component-flow2flow"
+          },
+          "routing": [
+            { "to": "NEXT_NODE_PLACEHOLDER" }
+          ]
+        }
+      }

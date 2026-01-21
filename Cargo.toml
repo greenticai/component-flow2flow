@@ -1,3 +1,12 @@
+[package]
+name = "component-flow2flow"
+version.workspace = true
+edition = "2021"
+rust-version = "1.89"
+license.workspace = true
+description = "Greentic component component-flow2flow"
+repository = "https://github.com/agentic/component-flow2flow"
+
 [workspace]
 members = [
     "flow2flow-contract",
@@ -13,9 +22,36 @@ resolver = "2"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-rust-version = "1.74"
+rust-version = "1.89"
 
 [workspace.dependencies]
+anyhow = "1"
+clap = { version = "4.5", features = ["derive"] }
 flow2flow-contract = { path = "flow2flow-contract" }
 flow2flow-runtime = { path = "flow2flow-runtime" }
 flow2flow-router-adapter = { path = "flow2flow-router-adapter" }
+greentic-interfaces-guest = { version = "0.4", default-features = false, features = ["component-node"] }
+greentic-types = { version = "0.4" }
+insta = { version = "1", features = ["yaml"] }
+jsonschema = "0.17"
+minijinja = { version = "2.0.3", features = ["json"] }
+once_cell = { version = "1" }
+schemars = { version = "0.8", features = ["derive"] }
+semver = { version = "1", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+tracing = "0.1"
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde_json = { workspace = true }
+greentic-types = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+greentic-interfaces-guest = { workspace = true }
