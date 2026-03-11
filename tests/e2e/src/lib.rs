@@ -53,10 +53,12 @@ mod tests {
         );
         assert_eq!(output["tenant"]["tenant_id"], "demo");
         assert_eq!(output["channel"], "telegram");
-        assert!(output["text"]
-            .as_str()
-            .unwrap()
-            .contains("Server CPU at 95%"));
+        assert!(
+            output["text"]
+                .as_str()
+                .unwrap()
+                .contains("Server CPU at 95%")
+        );
     }
 
     /// Test msg2event full conversion pipeline
