@@ -16,17 +16,7 @@ echo ""
 
 echo "🧪 Running E2E Tests..."
 echo ""
-
-echo "--- event2msg tests ---"
-cargo test -p flow2flow-e2e test_event2msg --quiet -- --nocapture 2>&1 | grep -E "(test |ok|PASSED)" || true
-
-echo ""
-echo "--- msg2event tests ---"
-cargo test -p flow2flow-e2e test_msg2event --quiet -- --nocapture 2>&1 | grep -E "(test |ok|PASSED)" || true
-
-echo ""
-echo "--- bidirectional conversion ---"
-cargo test -p flow2flow-e2e test_bidirectional --quiet -- --nocapture 2>&1 | grep -E "(test |ok|PASSED)" || true
+cargo test -p flow2flow-e2e -- --nocapture 2>&1 | grep -E "(test tests::|ok|passed)"
 
 echo ""
 echo "🔧 Running WASM Runtime Validation..."
