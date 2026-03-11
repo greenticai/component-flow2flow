@@ -4,6 +4,7 @@ members = [
     "components/event2msg",
     "components/msg2event",
     "tests/e2e",
+    "tests/wasm-runtime",
 ]
 
 [workspace.package]
