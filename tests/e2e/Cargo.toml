@@ -1,0 +1,11 @@
+[package]
+name = "flow2flow-e2e"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[dependencies]
+event2msg = { path = "../../components/event2msg" }
+msg2event = { path = "../../components/msg2event" }
+greentic-types.workspace = true
+serde_json.workspace = true
