@@ -30,8 +30,7 @@ pub fn describe() -> ComponentDescribe {
     let input_schema = schema::input_schema();
     let output_schema = schema::output_schema();
     let config_schema = schema::config_schema();
-    let op_hash =
-        schema_hash(&input_schema, &output_schema, &config_schema).expect("schema hash");
+    let op_hash = schema_hash(&input_schema, &output_schema, &config_schema).expect("schema hash");
 
     let operation = ComponentOperation {
         id: "convert".to_string(),

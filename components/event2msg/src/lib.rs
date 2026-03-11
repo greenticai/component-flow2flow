@@ -2,6 +2,8 @@
 //!
 //! Converts EventEnvelope to ChannelMessageEnvelope for cross-domain flow orchestration.
 
+#![allow(dead_code)] // Schema and descriptor functions used by runtime
+
 use greentic_interfaces_guest::component_v0_6::node;
 
 pub mod config;

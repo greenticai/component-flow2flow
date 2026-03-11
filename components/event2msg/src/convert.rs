@@ -5,9 +5,7 @@ use std::collections::BTreeMap;
 use greentic_types::cbor::canonical;
 use serde_json::Value as JsonValue;
 
-use crate::config::{
-    ActorOutput, ConvertInput, DestinationOutput, MessageOutput, TenantOutput,
-};
+use crate::config::{ActorOutput, ConvertInput, DestinationOutput, MessageOutput, TenantOutput};
 
 /// Executes the conversion from event to message.
 ///
@@ -108,9 +106,9 @@ fn convert_event_to_message(input: &[u8]) -> JsonValue {
 fn extract_session_from_topic(topic: &str) -> String {
     topic
         .split('.')
-        .last()
+        .next_back()
         .map(|s| s.to_string())
-        .unwrap_or_else(|| uuid_v4())
+        .unwrap_or_else(uuid_v4)
 }
 
 /// Builds the text content for the message.
