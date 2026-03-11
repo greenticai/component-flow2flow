@@ -1,0 +1,71 @@
+# Alert to Telegram - Event → Chat Demo
+# Converts incoming webhook alerts to Telegram notifications
+#
+# Trigger: POST /events/alerts with JSON payload
+# Result: Telegram message sent to configured chat
+
+id: alert_to_telegram
+title: Alert to Telegram
+description: Convert webhook alerts to Telegram notifications
+type: events
+start: receive_alert
+
+parameters:
+  # Target Telegram chat/user
+  telegram_chat_id: "{{env.DEMO_TELEGRAM_CHAT_ID}}"
+
+  # Alert severity emoji mapping
+  severity_emoji:
+    critical: "🚨"
+    warning: "⚠️"
+    info: "ℹ️"
+
+nodes:
+  # Step 1: Receive incoming webhook event
+  receive_alert:
+    events.subscribe:
+      topic: "webhooks.alerts.#"
+    routing:
+      - to: convert_to_message
+
+  # Step 2: Convert EventEnvelope → ChannelMessageEnvelope
+  convert_to_message:
+    flow2flow.event2msg:
+      op: convert
+      event: "{{receive_alert}}"
+      config:
+        target_channel: "telegram"
+        destination:
+          id: "{{parameters.telegram_chat_id}}"
+          kind: "chat_id"
+        text_template: |
+          {{#if (eq payload.severity "critical")}}🚨{{/if}}
+          {{#if (eq payload.severity "warning")}}⚠️{{/if}}
+          {{#if (eq payload.severity "info")}}ℹ️{{/if}}
+          *Alert: {{payload.message}}*
+
+          Host: `{{payload.host}}`
+          Severity: {{payload.severity}}
+          Time: {{time}}
+
+          Event ID: `{{id}}`
+    routing:
+      - to: send_telegram
+
+  # Step 3: Send message via Telegram provider
+  send_telegram:
+    emit.response:
+      channel: "telegram"
+      message: "{{convert_to_message}}"
+    routing:
+      - to: log_success
+
+  # Step 4: Log success
+  log_success:
+    log.info:
+      message: "Alert sent to Telegram"
+      data:
+        event_id: "{{receive_alert.id}}"
+        telegram_chat: "{{parameters.telegram_chat_id}}"
+    routing:
+      - out: true

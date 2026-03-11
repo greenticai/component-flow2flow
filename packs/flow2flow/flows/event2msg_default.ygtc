@@ -1,0 +1,28 @@
+id: event2msg_default
+title: Event to Message Bridge
+description: Convert incoming event to outbound message for messaging providers.
+type: messaging
+start: convert
+
+parameters:
+  target_channel: "telegram"
+  text_template: null
+
+nodes:
+  convert:
+    flow2flow.event2msg:
+      event: "{{input}}"
+      config:
+        target_channel: "{{parameters.target_channel}}"
+        destination:
+          id: "{{input.metadata.recipient}}"
+          kind: "user"
+        text_template: "{{parameters.text_template}}"
+    routing:
+      - to: emit
+
+  emit:
+    emit.response:
+      message: "{{convert}}"
+    routing:
+      - out: true

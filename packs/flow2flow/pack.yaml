@@ -1,0 +1,72 @@
+pack_id: greentic.flow2flow
+version: 0.1.0
+kind: extension
+publisher: Greentic
+
+components:
+  - id: flow2flow.event2msg
+    version: 0.1.0
+    world: greentic:component/component-v0-v6-v0@0.6.0
+    supports:
+      - messaging
+      - events
+    profiles:
+      default: default
+      supported:
+        - default
+    capabilities:
+      wasi:
+        random: false
+        clocks: true
+      host: {}
+    wasm: components/event2msg.wasm
+
+  - id: flow2flow.msg2event
+    version: 0.1.0
+    world: greentic:component/component-v0-v6-v0@0.6.0
+    supports:
+      - messaging
+      - events
+    profiles:
+      default: default
+      supported:
+        - default
+    capabilities:
+      wasi:
+        random: false
+        clocks: true
+      host: {}
+    wasm: components/msg2event.wasm
+
+flows:
+  - id: event2msg_default
+    file: flows/event2msg_default.ygtc
+    tags:
+      - bridge
+      - event2msg
+    entrypoints:
+      - default
+
+  - id: msg2event_default
+    file: flows/msg2event_default.ygtc
+    tags:
+      - bridge
+      - msg2event
+    entrypoints:
+      - default
+
+extensions:
+  greentic.ext.provides.v1:
+    inline:
+      provides:
+        - id: flow2flow.event2msg
+          kind: component
+          contract: greentic.component.v0.6.0
+          description: "Converts EventEnvelope to ChannelMessageEnvelope"
+        - id: flow2flow.msg2event
+          kind: component
+          contract: greentic.component.v0.6.0
+          description: "Converts ChannelMessageEnvelope to EventEnvelope"
+
+assets:
+  - path: README.md

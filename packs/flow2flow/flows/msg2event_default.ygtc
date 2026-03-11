@@ -1,0 +1,26 @@
+id: msg2event_default
+title: Message to Event Bridge
+description: Convert incoming message to outbound event for event providers.
+type: events
+start: convert
+
+parameters:
+  topic: "greentic.messaging.bridge"
+  event_type: "greentic.messaging.message.v1"
+
+nodes:
+  convert:
+    flow2flow.msg2event:
+      message: "{{input}}"
+      config:
+        topic: "{{parameters.topic}}"
+        event_type: "{{parameters.event_type}}"
+    routing:
+      - to: emit
+
+  emit:
+    events.emit:
+      topic: "{{convert.topic}}"
+      event: "{{convert}}"
+    routing:
+      - out: true

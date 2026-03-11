@@ -1,0 +1,121 @@
+# Bidirectional Demo - Simple Version
+# Shows both event→chat and chat→event in one place
+#
+# This is a simplified demo flow for quick testing
+
+id: bidirectional_demo
+title: Bidirectional Event-Chat Demo
+description: Simple demo showing event↔chat conversion
+type: messaging
+start: router
+
+nodes:
+  # Route based on input type
+  router:
+    switch:
+      value: "{{input._type}}"
+      cases:
+        - value: "event"
+          to: event_to_chat
+        - value: "message"
+          to: chat_to_event
+      default: detect_type
+
+  # Auto-detect input type
+  detect_type:
+    filter:
+      # If has 'topic' field, it's an event
+      condition: "{{input.topic}}"
+    routing:
+      - to: event_to_chat
+        when: "{{filter.passed}}"
+      - to: chat_to_event
+
+  # ============================================
+  # EVENT → CHAT PATH
+  # ============================================
+
+  event_to_chat:
+    flow2flow.event2msg:
+      op: convert
+      event: "{{input}}"
+      config:
+        target_channel: "{{input.metadata.target_channel | default: 'dummy'}}"
+        destination:
+          id: "{{input.metadata.destination_id | default: 'demo-user'}}"
+        text_template: |
+          📨 *Event Received*
+
+          Type: `{{type}}`
+          Source: `{{source}}`
+          Topic: `{{topic}}`
+
+          Payload:
+          ```
+          {{json_encode payload}}
+          ```
+    routing:
+      - to: output_message
+
+  output_message:
+    emit.response:
+      message: "{{event_to_chat}}"
+    routing:
+      - to: log_event_to_chat
+
+  log_event_to_chat:
+    log.info:
+      message: "Event converted to message"
+      data:
+        direction: "event→chat"
+        event_id: "{{input.id}}"
+        message_id: "{{event_to_chat.id}}"
+        channel: "{{event_to_chat.channel}}"
+    routing:
+      - out: true
+
+  # ============================================
+  # CHAT → EVENT PATH
+  # ============================================
+
+  chat_to_event:
+    flow2flow.msg2event:
+      op: convert
+      message: "{{input}}"
+      config:
+        topic: "demo.messages.{{input.channel | default: 'unknown'}}"
+        event_type: "greentic.demo.message.v1"
+        source: "demo.flow2flow"
+    routing:
+      - to: emit_event
+
+  emit_event:
+    events.emit:
+      topic: "{{chat_to_event.topic}}"
+      payload: "{{chat_to_event.payload}}"
+    routing:
+      - to: confirm_event
+
+  confirm_event:
+    emit.response:
+      text: |
+        ✅ *Message converted to Event*
+
+        Event ID: `{{chat_to_event.id}}`
+        Topic: `{{chat_to_event.topic}}`
+        Type: `{{chat_to_event.type}}`
+
+        Your message has been published to the event bus.
+    routing:
+      - to: log_chat_to_event
+
+  log_chat_to_event:
+    log.info:
+      message: "Message converted to event"
+      data:
+        direction: "chat→event"
+        message_id: "{{input.id}}"
+        event_id: "{{chat_to_event.id}}"
+        topic: "{{chat_to_event.topic}}"
+    routing:
+      - out: true

@@ -1,0 +1,163 @@
+# Telegram to Webhook - Chat → Event Demo
+# Converts Telegram commands to external webhook calls
+#
+# Trigger: User sends "/deploy production" in Telegram
+# Result: Event emitted to deployments topic, webhook called
+
+id: telegram_to_webhook
+title: Telegram Command to Webhook
+description: Convert Telegram commands to webhook events
+type: messaging
+start: receive_command
+
+parameters:
+  # Webhook endpoint for deployments
+  deploy_webhook_url: "{{env.DEPLOY_WEBHOOK_URL}}"
+
+  # Allowed commands
+  allowed_commands:
+    - "/deploy"
+    - "/status"
+    - "/rollback"
+
+nodes:
+  # Step 1: Receive incoming Telegram message
+  receive_command:
+    # Filter only command messages (starting with /)
+    filter:
+      condition: "{{starts_with input.text '/'}}"
+    routing:
+      - to: parse_command
+        when: "{{filter.passed}}"
+      - to: ignore_non_command
+        when: "{{not filter.passed}}"
+
+  # Step 2: Parse the command
+  parse_command:
+    templating.handlebars:
+      text: |
+        {
+          "command": "{{first (split input.text ' ')}}",
+          "args": "{{join (rest (split input.text ' ')) ' '}}",
+          "user_id": "{{input.from.id}}",
+          "chat_id": "{{input.session_id}}",
+          "timestamp": "{{now}}"
+        }
+    routing:
+      - to: validate_command
+
+  # Step 3: Validate command is allowed
+  validate_command:
+    filter:
+      condition: "{{includes parameters.allowed_commands parse_command.command}}"
+    routing:
+      - to: convert_to_event
+        when: "{{filter.passed}}"
+      - to: reject_command
+        when: "{{not filter.passed}}"
+
+  # Step 4: Convert ChannelMessageEnvelope → EventEnvelope
+  convert_to_event:
+    flow2flow.msg2event:
+      op: convert
+      message: "{{input}}"
+      config:
+        topic: "commands.{{substring parse_command.command 1}}"
+        event_type: "greentic.command.{{substring parse_command.command 1}}.v1"
+        source: "telegram.bot"
+    routing:
+      - to: emit_event
+
+  # Step 5: Emit event to NATS topic
+  emit_event:
+    events.emit:
+      topic: "{{convert_to_event.topic}}"
+      payload: "{{convert_to_event.payload}}"
+      metadata:
+        command: "{{parse_command.command}}"
+        args: "{{parse_command.args}}"
+        triggered_by: "{{parse_command.user_id}}"
+    routing:
+      - to: call_webhook
+        when: "{{eq parse_command.command '/deploy'}}"
+      - to: send_confirmation
+
+  # Step 6a: Call external webhook (for /deploy command)
+  call_webhook:
+    http.request:
+      method: "POST"
+      url: "{{parameters.deploy_webhook_url}}"
+      headers:
+        Content-Type: "application/json"
+        X-Triggered-By: "telegram:{{parse_command.user_id}}"
+      body:
+        action: "deploy"
+        environment: "{{parse_command.args}}"
+        event_id: "{{convert_to_event.id}}"
+        timestamp: "{{parse_command.timestamp}}"
+    routing:
+      - to: send_deploy_confirmation
+        when: "{{eq call_webhook.status 200}}"
+      - to: send_deploy_error
+        when: "{{neq call_webhook.status 200}}"
+
+  # Step 6b: Send confirmation back to Telegram
+  send_confirmation:
+    emit.response:
+      text: |
+        ✅ Command received!
+
+        Command: `{{parse_command.command}}`
+        Args: `{{parse_command.args}}`
+        Event ID: `{{convert_to_event.id}}`
+
+        Event emitted to topic: `{{convert_to_event.topic}}`
+    routing:
+      - out: true
+
+  # Step 7a: Deploy success confirmation
+  send_deploy_confirmation:
+    emit.response:
+      text: |
+        🚀 *Deployment Triggered!*
+
+        Environment: `{{parse_command.args}}`
+        Status: ✅ Webhook called successfully
+
+        Event ID: `{{convert_to_event.id}}`
+        Webhook Response: {{call_webhook.status}}
+    routing:
+      - out: true
+
+  # Step 7b: Deploy error
+  send_deploy_error:
+    emit.response:
+      text: |
+        ❌ *Deployment Failed*
+
+        Environment: `{{parse_command.args}}`
+        Error: Webhook returned {{call_webhook.status}}
+
+        Please check the deployment service.
+    routing:
+      - out: true
+
+  # Error: Unknown command
+  reject_command:
+    emit.response:
+      text: |
+        ❓ Unknown command: `{{parse_command.command}}`
+
+        Available commands:
+        {{#each parameters.allowed_commands}}
+        • `{{this}}`
+        {{/each}}
+    routing:
+      - out: true
+
+  # Ignore non-command messages
+  ignore_non_command:
+    log.debug:
+      message: "Ignoring non-command message"
+    routing:
+      - out: true
