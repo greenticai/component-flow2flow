@@ -8,20 +8,18 @@ use greentic_types::schemas::common::schema_ir::{AdditionalProperties, SchemaIr}
 /// Returns the input schema for the convert operation.
 /// Expects an EventEnvelope-like structure plus configuration.
 pub fn input_schema() -> SchemaIr {
-    let event_schema = object_schema(
-        vec![
-            ("id", string_schema(1, 256), true),
-            ("topic", string_schema(1, 512), true),
-            ("type", string_schema(1, 256), true),
-            ("source", string_schema(1, 1024), true),
-            ("tenant", tenant_ctx_schema(), true),
-            ("subject", string_schema(1, 512), false),
-            ("time", string_schema(1, 64), false), // RFC3339 timestamp
-            ("correlation_id", string_schema(1, 256), false),
-            ("payload", any_schema(), false),
-            ("metadata", metadata_schema(), false),
-        ],
-    );
+    let event_schema = object_schema(vec![
+        ("id", string_schema(1, 256), true),
+        ("topic", string_schema(1, 512), true),
+        ("type", string_schema(1, 256), true),
+        ("source", string_schema(1, 1024), true),
+        ("tenant", tenant_ctx_schema(), true),
+        ("subject", string_schema(1, 512), false),
+        ("time", string_schema(1, 64), false), // RFC3339 timestamp
+        ("correlation_id", string_schema(1, 256), false),
+        ("payload", any_schema(), false),
+        ("metadata", metadata_schema(), false),
+    ]);
 
     let config_schema = object_schema(vec![
         ("target_channel", string_schema(1, 64), true),
