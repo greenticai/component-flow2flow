@@ -5,9 +5,7 @@ use std::collections::BTreeMap;
 use greentic_types::cbor::canonical;
 use serde_json::Value as JsonValue;
 
-use crate::config::{
-    ActorOutput, ConvertInput, DestinationOutput, MessageOutput, TenantOutput,
-};
+use crate::config::{ActorOutput, ConvertInput, DestinationOutput, MessageOutput, TenantOutput};
 
 /// Executes the conversion from event to message.
 ///
