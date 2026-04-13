@@ -2,6 +2,8 @@
 //!
 //! Converts EventEnvelope to ChannelMessageEnvelope for cross-domain flow orchestration.
 
+#![cfg_attr(not(target_arch = "wasm32"), allow(dead_code))]
+
 use greentic_interfaces_guest::component_v0_6::node;
 
 pub mod config;
