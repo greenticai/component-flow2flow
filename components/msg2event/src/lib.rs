@@ -4,7 +4,7 @@
 
 #![cfg_attr(not(target_arch = "wasm32"), allow(dead_code))]
 
-use greentic_interfaces_guest::component_v0_6::node;
+use greentic_interfaces_guest::component_v0_6::{component_i18n, component_qa, node};
 
 pub mod config;
 pub mod convert;
@@ -76,5 +76,29 @@ impl node::Guest for Component {
     }
 }
 
+impl component_qa::Guest for Component {
+    fn qa_spec(_mode: component_qa::QaMode) -> Vec<u8> {
+        Vec::new()
+    }
+
+    fn apply_answers(
+        _mode: component_qa::QaMode,
+        current_config: Vec<u8>,
+        _answers: Vec<u8>,
+    ) -> Vec<u8> {
+        current_config
+    }
+}
+
+impl component_i18n::Guest for Component {
+    fn i18n_keys() -> Vec<String> {
+        Vec::new()
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
-greentic_interfaces_guest::export_component_v060!(Component);
+greentic_interfaces_guest::export_component_v060!(
+    Component,
+    component_qa: Component,
+    component_i18n: Component,
+);
