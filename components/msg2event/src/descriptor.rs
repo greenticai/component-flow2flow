@@ -57,6 +57,7 @@ pub fn describe() -> ComponentDescribe {
         metadata: BTreeMap::new(),
         operations: vec![operation],
         config_schema,
+        outcomes: Vec::new(),
     }
 }
 
